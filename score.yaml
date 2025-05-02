@@ -1,0 +1,13 @@
+apiVersion: score.dev/v1b1
+metadata:
+  name: expense-tracker-webapp
+  project: expense-tracker
+  organization: expense-tracker-webapp
+service:
+  ports:
+    default:
+      port: 8080
+      protocol: TCP
+containers:
+  container-one1:
+    image: .

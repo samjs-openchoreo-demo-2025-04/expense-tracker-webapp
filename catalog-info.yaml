@@ -1,0 +1,28 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: expense-tracker-webapp
+  description: Expense Tracker React Webapp
+  annotations:
+    github.com/project-slug: samjs-openchoreo-demo-2025-04/expense-tracker-webapp
+    # backstage.io/kubernetes-label-selector: 'core.choreo.dev/component=expense-tracker-webapp,core.choreo.dev/organization=default-org,core.choreo.dev/project=expense-tracker'
+    backstage.io/kubernetes-id: expense-tracker-webapp
+  tags:
+    - react 
+    - openchoreo
+  labels:
+    core.choreo.dev/name: expense-tracker-webapp
+    core.choreo.dev/organization: default-org
+    core.choreo.dev/project: expense-tracker
+  links:
+    - url: https://github.com/samjs-openchoreo-demo-2025-04/expense-tracker-webapp
+      title: GitHub Repo
+      icon: github
+    - url: https://github.com/openchoreo/openchoreo
+      title: OpenChoreo
+      icon: web
+spec:
+  type: website
+  lifecycle: experimental
+  owner: group:default/guests
+  system: expense-tracker

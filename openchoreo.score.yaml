@@ -1,0 +1,9 @@
+apiversion: openchoreo.dev/v1
+
+apis:
+  default: 
+    type: REST
+    basePath: /
+    visibility: 
+      public: true
+      organization: true

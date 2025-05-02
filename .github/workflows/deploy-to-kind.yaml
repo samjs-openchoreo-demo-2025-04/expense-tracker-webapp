@@ -1,0 +1,63 @@
+name: Build and Push to GHCR
+
+on:
+  workflow_dispatch:  # manually trigger from GitHub UI
+  push:
+    branches: main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      KUBECONFIG: ${{ github.workspace }}/kubeconfig.yaml
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}         
+
+      - name: Get short SHA
+        id: vars 
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:   
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            ${{ env.SHORT_SHA }}
+            main       
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true          
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}         
+
+      - name: Deploy component version to OpenChoreo
+        run: |
+          curl --fail --show-error --location -X POST "${{ vars.OPENCHOREO_CP_URL }}/deployments" \
+            -H "Content-Type: application/json" \
+            --data '{
+              "org_name": "default-org",
+              "project_name": "expense-tracker",
+              "component_name": "expense-tracker-webapp",
+              "deployment_track": "main",
+              "score_file_path": "https://raw.githubusercontent.com/samjs-openchoreo-demo-2025-04/expense-tracker-webapp/refs/heads/main/score.yaml",
+              "extension_file_path": "https://raw.githubusercontent.com/samjs-openchoreo-demo-2025-04/expense-tracker-webapp/refs/heads/main/openchoreo.score.yaml",
+              "image": "ghcr.io/samjs-openchoreo-demo-2025-04/expense-tracker-webapp:${{ env.SHORT_SHA }}"
+            }'
