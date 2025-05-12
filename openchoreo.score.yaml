@@ -6,4 +6,4 @@ apis:
     basePath: /
     visibility: 
       public: true
-      organization: true
+      organization: false
